@@ -22,11 +22,11 @@ permissions:
 jobs:
 
   setup:
-    uses: unbounded-tech/workflows-crossplane/.github/workflows/setup.yaml@v2.10.0
+    uses: unbounded-tech/workflows-crossplane/.github/workflows/setup.yaml@v2.10.2
 
   validate:
     needs: setup
-    uses: unbounded-tech/workflows-crossplane/.github/workflows/validate.yaml@v2.10.0
+    uses: unbounded-tech/workflows-crossplane/.github/workflows/validate.yaml@v2.10.2
     with:
       examples: |
         [
@@ -43,17 +43,18 @@ jobs:
 
   test:
     needs: setup
-    uses: unbounded-tech/workflows-crossplane/.github/workflows/test.yaml@v2.10.0
+    uses: unbounded-tech/workflows-crossplane/.github/workflows/test.yaml@v2.10.2
 
   e2e:
     needs: setup
-    uses: unbounded-tech/workflows-crossplane/.github/workflows/e2e.yaml@v2.10.0
+    uses: unbounded-tech/workflows-crossplane/.github/workflows/e2e.yaml@v2.10.2
     with:
       aws: true
       aws-use-oidc: true
       aws-account-id: "034489662075"
       aws-region: us-east-2
       timeout-minutes: 30
+      cleanup-timeout-minutes: 30
       debug-resource-types: |
         [
           "network.aws.hops.ops.com.ai"
@@ -63,7 +64,7 @@ jobs:
     needs: 
       - validate
       - test
-    uses: unbounded-tech/workflows-crossplane/.github/workflows/publish.yaml@v2.10.0
+    uses: unbounded-tech/workflows-crossplane/.github/workflows/publish.yaml@v2.10.2
     secrets: inherit
     with:
       tag: pr-${{ github.event.pull_request.number }}-${{ github.sha }}
