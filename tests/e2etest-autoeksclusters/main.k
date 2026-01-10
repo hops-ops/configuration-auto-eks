@@ -149,7 +149,7 @@ _items = [
                         clusterName = _test_name
                         region = _region
                         accountId = _account_id
-                        version = "1.31"
+                        version = "1.34"
                         # Use subnet selector to find private subnets from Network
                         subnetSelector = {
                             matchLabels = {
