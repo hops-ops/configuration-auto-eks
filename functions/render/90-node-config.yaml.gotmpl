@@ -29,7 +29,7 @@ spec:
           throughput: {{ $am.nodeConfig.nodeClass.ephemeralStorage.throughput }}
         networkPolicy: DefaultAllow
         networkPolicyEventLogs: Disabled
-        role: {{ $am.cluster.name }}-nodegroup
+        role: {{ $am.cluster.name }}-node
         securityGroupSelectorTerms:
         - id: {{ $obs.cluster.securityGroupId }}
         subnetSelectorTerms:

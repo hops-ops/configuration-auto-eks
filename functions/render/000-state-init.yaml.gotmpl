@@ -165,7 +165,7 @@
 {{ $cpRoleAtProvider := ((($cpRoleEntry.resource | default (dict)).status | default (dict)).atProvider | default (dict)) }}
 
 # Node IAM Role
-{{ $nodeRoleEntry := get $raw "iam-role-nodegroup" | default (dict) }}
+{{ $nodeRoleEntry := get $raw "iam-role-node" | default (dict) }}
 {{ $nodeRoleAtProvider := ((($nodeRoleEntry.resource | default (dict)).status | default (dict)).atProvider | default (dict)) }}
 
 # KMS Key
@@ -193,7 +193,7 @@
   "nodeRole" (dict
     "arn" ($nodeRoleAtProvider.arn | default "")
     "name" ($nodeRoleAtProvider.id | default "")
-    "ready" (get $readiness "iam-role-nodegroup" | default false)
+    "ready" (get $readiness "iam-role-node" | default false)
   )
   "kms" (dict
     "arn" ($kmsAtProvider.arn | default "")

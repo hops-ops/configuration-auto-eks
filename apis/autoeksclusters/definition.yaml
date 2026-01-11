@@ -184,7 +184,7 @@ spec:
                         description: |
                           Existing IAM role name for node groups to import (not ARN).
                           Use with managementPolicies excluding "Delete" to adopt without risk of deletion.
-                          Example: "my-cluster-nodegroup"
+                          Example: "my-cluster-node"
 
               # Access Entries - optional list of custom admin access
               accessEntries:

@@ -43,10 +43,10 @@ spec:
 apiVersion: iam.aws.m.upbound.io/v1beta1
 kind: Role
 metadata:
-  name: {{ $am.cluster.name }}-nodegroup
+  name: {{ $am.cluster.name }}-node
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "iam-role-nodegroup" }}
+    {{ setResourceNameAnnotation "iam-role-node" }}
     {{- if $am.iam.nodeRole.externalName }}
     crossplane.io/external-name: {{ $am.iam.nodeRole.externalName }}
     {{- end }}

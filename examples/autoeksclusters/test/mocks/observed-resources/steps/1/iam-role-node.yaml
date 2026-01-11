@@ -1,0 +1,19 @@
+apiVersion: iam.aws.m.upbound.io/v1beta1
+kind: Role
+metadata:
+  name: test-cluster-node
+  annotations:
+    crossplane.io/composition-resource-name: iam-role-node
+    gotemplating.fn.crossplane.io/composition-resource-name: iam-role-node
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Available
+    - type: Synced
+      status: "True"
+  atProvider:
+    arn: arn:aws:iam::123456789012:role/test-cluster-node
+    name: test-cluster-node
+    id: test-cluster-node
+    uniqueId: AROAEXAMPLEID987654321

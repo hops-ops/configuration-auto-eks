@@ -20,7 +20,7 @@ spec:
   forProvider:
     clusterName: {{ $am.cluster.name }}
     principalArnFromRoleRef:
-      name: {{ $am.cluster.name }}-nodegroup
+      name: {{ $am.cluster.name }}-node
     region: {{ $am.cluster.region }}
     type: EC2
   providerConfigRef:
@@ -122,7 +122,7 @@ spec:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
     resourceRef:
-      name: {{ $am.cluster.name }}-nodegroup
+      name: {{ $am.cluster.name }}-node
   by:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: AccessEntry

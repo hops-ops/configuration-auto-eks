@@ -11,7 +11,7 @@
 # Computed IAM Values
 # ==============================================================================
 {{ $controlPlaneRoleName := printf "%s-controlplane" $eff.clusterName }}
-{{ $nodeRoleName := printf "%s-nodegroup" $eff.clusterName }}
+{{ $nodeRoleName := printf "%s-node" $eff.clusterName }}
 {{ $controlPlaneRoleArn := printf "arn:aws:iam::%s:role/%s" $eff.accountId $controlPlaneRoleName }}
 {{ $nodeRoleArn := printf "arn:aws:iam::%s:role/%s" $eff.accountId $nodeRoleName }}
 

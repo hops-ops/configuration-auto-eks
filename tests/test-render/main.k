@@ -30,7 +30,7 @@ _items = [
                 {
                     apiVersion = "iam.aws.m.upbound.io/v1beta1"
                     kind = "Role"
-                    metadata.name = "test-cluster-nodegroup"
+                    metadata.name = "test-cluster-node"
                 }
                 {
                     apiVersion = "iam.aws.m.upbound.io/v1beta1"

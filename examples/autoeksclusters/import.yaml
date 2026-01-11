@@ -48,7 +48,7 @@ spec:
     controlPlaneRole:
       externalName: my-existing-cluster-controlplane
     nodeRole:
-      externalName: my-existing-cluster-nodegroup
+      externalName: my-existing-cluster-node
 
   # KMS key external name for import
   kms:

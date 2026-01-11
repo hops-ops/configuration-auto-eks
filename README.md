@@ -224,7 +224,7 @@ spec:
   imports:
     cluster: my-existing-cluster
     controlPlaneRole: my-existing-cluster-controlplane
-    nodeRole: my-existing-cluster-nodegroup
+    nodeRole: my-existing-cluster-node
     kmsKey: 12345678-1234-1234-1234-123456789012
     # oidcProvider: arn:aws:iam::123456789012:oidc-provider/...
 
@@ -276,7 +276,7 @@ spec:
 | Resource | Purpose | Condition |
 |----------|---------|-----------|
 | `iam.Role` (controlplane) | EKS control plane permissions | Always |
-| `iam.Role` (nodegroup) | Node instance permissions | Always |
+| `iam.Role` (node) | Node instance permissions | Always |
 | `iam.Policy` (resource-tagging) | Auto Mode resource tagging | Always |
 | `iam.RolePolicyAttachment` (6x) | AWS managed policy attachments | When roles ready |
 | `kms.Key` + `kms.Alias` | Secrets encryption | When encryption enabled |
@@ -287,10 +287,12 @@ spec:
 | `ec2.SecurityGroupIngressRule` | Custom ingress rules | When SG rules enabled |
 | `kubernetes.Object` (NodeClass) | Karpenter node configuration | When cluster auth ready |
 | `kubernetes.Object` (NodePool) | Karpenter workload scheduling | When node config enabled |
-| `kubernetes.ProviderConfig` | K8s provider for in-cluster | When cluster auth ready |
-| `helm.ProviderConfig` | Helm provider for in-cluster | When cluster auth ready |
+| `kubernetes.ProviderConfig` | K8s provider for in-cluster (uses namespace from claim) | When cluster auth ready |
+| `helm.ProviderConfig` | Helm provider for in-cluster (uses namespace from claim) | When cluster auth ready |
 
 ## Configuration Reference
+
+**Namespace behavior:** The `metadata.namespace` of the claim is automatically used for the kubeconfig secret location. The generated Kubernetes and Helm ProviderConfigs reference this namespace to find the cluster credentials.
 
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
