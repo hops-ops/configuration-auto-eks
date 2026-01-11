@@ -34,6 +34,8 @@
 # Build $state.automode
 # ==============================================================================
 {{ $automode := dict
+  "namespace" $eff.namespace
+
   "cluster" (dict
     "name" $eff.clusterName
     "region" $eff.region

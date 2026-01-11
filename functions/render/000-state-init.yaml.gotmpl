@@ -37,6 +37,7 @@
 
 {{ $effective := dict
   "clusterName" $spec.clusterName
+  "namespace" ($metadata.namespace | default "default")
   "region" $spec.region
   "accountId" $spec.accountId
   "version" $spec.version

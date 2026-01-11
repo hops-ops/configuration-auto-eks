@@ -64,6 +64,7 @@ spec:
     secretRef:
       key: kubeconfig
       name: {{ $am.cluster.name }}
+      namespace: {{ $am.namespace }}
     source: Secret
 
 ---
@@ -80,5 +81,6 @@ spec:
     secretRef:
       key: kubeconfig
       name: {{ $am.cluster.name }}
+      namespace: {{ $am.namespace }}
     source: Secret
 {{ end }}
