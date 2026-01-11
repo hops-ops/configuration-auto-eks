@@ -96,6 +96,12 @@ _items = [
                         }
                     }
                 }
+            ]
+
+            # Manifests: Network and AutoEKSCluster (applied after initResources are Ready)
+            # Uses subnetSelector to find Network's private subnets by label
+            # Resources created in manifests are deleted during cleanup
+            manifests = [
                 {
                     apiVersion = "aws.hops.ops.com.ai/v1alpha1"
                     kind = "Network"
@@ -135,11 +141,6 @@ _items = [
                         }
                     }
                 }
-            ]
-
-            # Manifests: AutoEKSCluster (applied after initResources are Ready)
-            # Uses subnetSelector to find Network's private subnets by label
-            manifests = [
                 awsv1alpha1.AutoEKSCluster {
                     metadata = {
                         name = _test_name
