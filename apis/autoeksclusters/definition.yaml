@@ -315,14 +315,6 @@ spec:
                         type: string
                         description: Name of the NodeClass.
                         default: hops-default
-                      amiFamily:
-                        type: string
-                        description: AMI family for nodes.
-                        enum:
-                        - AL2
-                        - AL2023
-                        - Bottlerocket
-                        default: AL2023
                       ephemeralStorage:
                         type: object
                         description: Ephemeral storage configuration.
@@ -351,47 +343,14 @@ spec:
                         type: string
                         description: Name of the NodePool.
                         default: hops-spot
-                      capacityType:
-                        type: string
-                        description: Capacity type for nodes.
-                        enum:
-                        - spot
-                        - on-demand
-                        default: spot
-                      instanceCategories:
+                      requirements:
                         type: array
-                        description: Instance categories to use (c=compute, m=general, r=memory).
+                        description: |
+                          Custom Karpenter requirements for node selection.
+                          If not specified, defaults to spot instances, c/m/r categories, gen 4+, amd64, linux.
                         items:
-                          type: string
-                        default:
-                        - c
-                        - m
-                        - r
-                      architectures:
-                        type: array
-                        description: CPU architectures to use (amd64 and/or arm64 for Graviton).
-                        items:
-                          type: string
-                          enum:
-                          - amd64
-                          - arm64
-                        default:
-                        - amd64
-                      minGeneration:
-                        type: integer
-                        description: Minimum instance generation (6+ recommended for better performance).
-                        default: 6
-                      instanceSizes:
-                        type: object
-                        description: Instance size constraints.
-                        properties:
-                          min:
-                            type: string
-                            description: Minimum instance size (e.g., "medium", "large").
-                            default: medium
-                          max:
-                            type: string
-                            description: Maximum instance size (e.g., "4xlarge", "8xlarge"). Leave empty for no limit.
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                       expireAfter:
                         type: string
                         description: Duration after which nodes expire (e.g., "336h").

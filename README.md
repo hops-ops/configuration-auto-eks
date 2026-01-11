@@ -60,7 +60,7 @@ Add features as your team grows - custom access entries, tags, and node configur
 **Why expand?**
 - Multiple team members need cluster access
 - Cost allocation requires proper tagging
-- Workloads need specific instance types or architectures
+- Workloads need custom node requirements (instance types, architectures)
 
 ```yaml
 apiVersion: aws.hops.ops.com.ai/v1alpha1
@@ -92,14 +92,26 @@ spec:
 
   nodeConfig:
     nodeClass:
-      amiFamily: AL2023
       ephemeralStorage:
         size: "100Gi"
     nodePool:
-      capacityType: spot
-      instanceCategories: ["c", "m", "r"]
-      architectures: ["amd64", "arm64"]  # Enable Graviton
-      minGeneration: 7
+      # Custom requirements for Graviton support
+      requirements:
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values: ["spot"]
+      - key: eks.amazonaws.com/instance-category
+        operator: In
+        values: ["c", "m", "r"]
+      - key: eks.amazonaws.com/instance-generation
+        operator: Gt
+        values: ["6"]
+      - key: kubernetes.io/arch
+        operator: In
+        values: ["amd64", "arm64"]
+      - key: kubernetes.io/os
+        operator: In
+        values: ["linux"]
 ```
 
 ### Stage 3: Enterprise Scale
@@ -169,19 +181,28 @@ spec:
 
   nodeConfig:
     nodeClass:
-      amiFamily: AL2023
       ephemeralStorage:
         size: "200Gi"
         iops: 6000
         throughput: 250
     nodePool:
-      capacityType: on-demand  # Production uses on-demand
-      instanceCategories: ["c", "m", "r"]
-      architectures: ["amd64", "arm64"]
-      minGeneration: 7
-      instanceSizes:
-        min: large
-        max: 8xlarge
+      # Production: on-demand, larger instances, conservative disruption
+      requirements:
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values: ["on-demand"]
+      - key: eks.amazonaws.com/instance-category
+        operator: In
+        values: ["c", "m", "r"]
+      - key: eks.amazonaws.com/instance-generation
+        operator: Gt
+        values: ["6"]
+      - key: kubernetes.io/arch
+        operator: In
+        values: ["amd64", "arm64"]
+      - key: kubernetes.io/os
+        operator: In
+        values: ["linux"]
       disruption:
         consolidationPolicy: WhenEmpty  # Conservative for production
         consolidateAfter: "1h"
@@ -319,9 +340,7 @@ spec:
 | `oidc.enabled` | No | `false` | Create OIDC provider for IRSA |
 | `nodeConfig.enabled` | No | `true` | Create NodeClass/NodePool |
 | `nodeConfig.nodeClass.name` | No | `hops-default` | NodeClass name |
-| `nodeConfig.nodeClass.amiFamily` | No | `AL2023` | AMI family |
-| `nodeConfig.nodePool.capacityType` | No | `spot` | Capacity type (spot/on-demand) |
-| `nodeConfig.nodePool.architectures` | No | `["amd64"]` | CPU architectures |
+| `nodeConfig.nodePool.requirements` | No | spot, c/m/r, gen4+, amd64 | Karpenter node requirements |
 
 ## Development
 

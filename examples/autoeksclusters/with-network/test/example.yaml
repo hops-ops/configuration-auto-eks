@@ -41,16 +41,27 @@ spec:
   # KMS encryption for secrets
   encryptionEnabled: true
 
-  # Node configuration
+  # Node configuration (uses sensible defaults if requirements not specified)
   nodeConfig:
     enabled: true
     nodePool:
-      capacityType: spot
-      instanceCategories: ["m", "c", "r"]
-      architectures: ["amd64", "arm64"]
-      instanceSizes:
-        min: medium
-        max: 4xlarge
+      # Custom requirements example - omit to use defaults (spot, c/m/r, gen4+, amd64)
+      requirements:
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values: ["spot"]
+      - key: eks.amazonaws.com/instance-category
+        operator: In
+        values: ["m", "c", "r"]
+      - key: eks.amazonaws.com/instance-generation
+        operator: Gt
+        values: ["4"]
+      - key: kubernetes.io/arch
+        operator: In
+        values: ["amd64", "arm64"]
+      - key: kubernetes.io/os
+        operator: In
+        values: ["linux"]
 
   # OIDC for IRSA (prefer Pod Identity for new workloads)
   oidc:

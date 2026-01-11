@@ -167,19 +167,9 @@ _items = [
                         }
                         # Enable public endpoint so e2e test can reach cluster API
                         publicAccess = True
-                        # Use minimal node config for faster test
+                        # Use default node config (spot, c/m/r, gen4+, amd64)
                         nodeConfig = {
                             enabled = True
-                            nodePool = {
-                                enabled = True
-                                capacityType = "spot"
-                                instanceCategories = ["m"]
-                                architectures = ["amd64"]
-                                instanceSizes = {
-                                    min = "medium"
-                                    max = "xlarge"
-                                }
-                            }
                         }
                         # Enable OIDC for testing IRSA functionality
                         oidc = {

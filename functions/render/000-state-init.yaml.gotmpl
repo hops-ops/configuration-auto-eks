@@ -24,7 +24,6 @@
 {{ $nodeClassConfig := $nodeConfig.nodeClass | default (dict) }}
 {{ $ephemeralStorage := $nodeClassConfig.ephemeralStorage | default (dict) }}
 {{ $nodePoolConfig := $nodeConfig.nodePool | default (dict) }}
-{{ $instanceSizesConfig := $nodePoolConfig.instanceSizes | default (dict) }}
 {{ $disruptionConfig := $nodePoolConfig.disruption | default (dict) }}
 {{ $sgRules := $spec.securityGroupRules | default (dict) }}
 {{ $oidcConfig := $spec.oidc | default (dict) }}
@@ -82,7 +81,6 @@
     "enabled" ($nodeConfig.enabled | default true)
     "nodeClass" (dict
       "name" ($nodeClassConfig.name | default "hops-default")
-      "amiFamily" ($nodeClassConfig.amiFamily | default "AL2023")
       "ephemeralStorage" (dict
         "size" ($ephemeralStorage.size | default "80Gi")
         "iops" ($ephemeralStorage.iops | default 3000)
@@ -92,12 +90,7 @@
     "nodePool" (dict
       "enabled" ($nodePoolConfig.enabled | default true)
       "name" ($nodePoolConfig.name | default "hops-spot")
-      "capacityType" ($nodePoolConfig.capacityType | default "spot")
-      "instanceCategories" ($nodePoolConfig.instanceCategories | default (list "c" "m" "r"))
-      "architectures" ($nodePoolConfig.architectures | default (list "amd64"))
-      "minGeneration" ($nodePoolConfig.minGeneration | default 6)
-      "minInstanceSize" ($instanceSizesConfig.min | default "medium")
-      "maxInstanceSize" ($instanceSizesConfig.max | default "")
+      "requirements" ($nodePoolConfig.requirements | default (list))
       "expireAfter" ($nodePoolConfig.expireAfter | default "336h")
       "disruption" (dict
         "consolidateAfter" ($disruptionConfig.consolidateAfter | default "30s")

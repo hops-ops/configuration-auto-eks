@@ -54,7 +54,6 @@ spec:
     enabled: true
     nodeClass:
       name: default
-      amiFamily: AL2023
       ephemeralStorage:
         size: 100Gi
         iops: 4000
@@ -62,12 +61,7 @@ spec:
     nodePool:
       enabled: true
       name: general
-      capacityType: spot
-      instanceCategories:
-        - c
-        - m
-        - r
-      minGeneration: 6
+      # Uses defaults: spot, c/m/r, gen4+, amd64, linux
       expireAfter: 720h
       disruption:
         consolidateAfter: 1m

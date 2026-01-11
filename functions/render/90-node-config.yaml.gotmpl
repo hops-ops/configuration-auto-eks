@@ -29,14 +29,13 @@ spec:
           throughput: {{ $am.nodeConfig.nodeClass.ephemeralStorage.throughput }}
         networkPolicy: DefaultAllow
         networkPolicyEventLogs: Disabled
-        role: {{ $am.cluster.name }}-node
+        role: {{ $obs.nodeRole.name }}
         securityGroupSelectorTerms:
         - id: {{ $obs.cluster.securityGroupId }}
         subnetSelectorTerms:
         {{- range $subnet := $am.cluster.subnetIds }}
         - id: {{ $subnet }}
         {{- end }}
-        amiFamily: {{ $am.nodeConfig.nodeClass.amiFamily }}
         tags: {{ $am.tags | toJson }}
   providerConfigRef:
     name: {{ $am.cluster.name }}
@@ -79,68 +78,31 @@ spec:
               kind: NodeClass
               name: {{ $am.nodeConfig.nodeClass.name }}
             requirements:
+            {{- if $am.nodeConfig.nodePool.requirements }}
+            {{- toYaml $am.nodeConfig.nodePool.requirements | nindent 12 }}
+            {{- else }}
             - key: karpenter.sh/capacity-type
               operator: In
               values:
-              - {{ $am.nodeConfig.nodePool.capacityType }}
+              - spot
             - key: eks.amazonaws.com/instance-category
               operator: In
-              values: {{ $am.nodeConfig.nodePool.instanceCategories | toJson }}
+              values:
+              - c
+              - m
+              - r
             - key: eks.amazonaws.com/instance-generation
               operator: Gt
               values:
-              - "{{ $am.nodeConfig.nodePool.minGeneration }}"
+              - "4"
             - key: kubernetes.io/arch
               operator: In
-              values: {{ $am.nodeConfig.nodePool.architectures | toJson }}
+              values:
+              - amd64
             - key: kubernetes.io/os
               operator: In
               values:
               - linux
-            {{- if $am.nodeConfig.nodePool.minInstanceSize }}
-            - key: eks.amazonaws.com/instance-size
-              operator: NotIn
-              values:
-              {{- if eq $am.nodeConfig.nodePool.minInstanceSize "large" }}
-              - nano
-              - micro
-              - small
-              - medium
-              {{- else if eq $am.nodeConfig.nodePool.minInstanceSize "medium" }}
-              - nano
-              - micro
-              - small
-              {{- else if eq $am.nodeConfig.nodePool.minInstanceSize "small" }}
-              - nano
-              - micro
-              {{- end }}
-            {{- end }}
-            {{- if $am.nodeConfig.nodePool.maxInstanceSize }}
-            - key: eks.amazonaws.com/instance-size
-              operator: In
-              values:
-              {{- if eq $am.nodeConfig.nodePool.maxInstanceSize "4xlarge" }}
-              - medium
-              - large
-              - xlarge
-              - 2xlarge
-              - 3xlarge
-              - 4xlarge
-              {{- else if eq $am.nodeConfig.nodePool.maxInstanceSize "8xlarge" }}
-              - medium
-              - large
-              - xlarge
-              - 2xlarge
-              - 3xlarge
-              - 4xlarge
-              - 6xlarge
-              - 8xlarge
-              {{- else if eq $am.nodeConfig.nodePool.maxInstanceSize "2xlarge" }}
-              - medium
-              - large
-              - xlarge
-              - 2xlarge
-              {{- end }}
             {{- end }}
             terminationGracePeriod: 24h0m0s
   providerConfigRef:

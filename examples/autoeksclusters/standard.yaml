@@ -50,12 +50,11 @@ spec:
   oidc:
     enabled: false
 
-  # Node configuration
+  # Node configuration (uses sensible defaults)
   nodeConfig:
     enabled: true
     nodeClass:
       name: hops-default
-      amiFamily: AL2023
       ephemeralStorage:
         size: "100Gi"
         iops: 3000
@@ -63,12 +62,7 @@ spec:
     nodePool:
       enabled: true
       name: hops-spot
-      capacityType: spot
-      instanceCategories:
-        - c
-        - m
-        - r
-      minGeneration: 6
+      # Uses defaults: spot, c/m/r, gen4+, amd64, linux
       expireAfter: "336h"
       disruption:
         consolidateAfter: "60s"
