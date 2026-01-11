@@ -165,6 +165,8 @@ _items = [
                             "e2etest" = "true"
                             "test-run" = _now
                         }
+                        # Enable public endpoint so e2e test can reach cluster API
+                        publicAccess = True
                         # Use minimal node config for faster test
                         nodeConfig = {
                             enabled = True
