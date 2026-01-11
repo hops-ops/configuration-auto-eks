@@ -63,7 +63,6 @@ spec:
   credentials:
     secretRef:
       key: kubeconfig
-      namespace: crossplane-system
       name: {{ $am.cluster.name }}
     source: Secret
 
@@ -80,7 +79,6 @@ spec:
   credentials:
     secretRef:
       key: kubeconfig
-      namespace: crossplane-system
       name: {{ $am.cluster.name }}
     source: Secret
 {{ end }}
