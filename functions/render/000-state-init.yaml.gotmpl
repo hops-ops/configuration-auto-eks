@@ -102,116 +102,15 @@
 }}
 
 # ==============================================================================
-# Extract Observed State from $.observed.resources
-# ==============================================================================
-{{ $raw := $.observed.resources | default (dict) }}
-
-# Resource Readiness Helper
-{{ $readiness := dict }}
-{{ range $name, $entry := $raw }}
-  {{ $ready := false }}
-  {{ $resource := $entry.resource | default (dict) }}
-  {{ $status := $resource.status | default (dict) }}
-  {{ $conditions := $status.conditions | default (list) }}
-  {{ range $conditions }}
-    {{ if and (eq (get . "type") "Ready") (eq (get . "status") "True") }}
-      {{ $ready = true }}
-    {{ end }}
-  {{ end }}
-  {{ $readiness = merge $readiness (dict $name $ready) }}
-{{ end }}
-
-# Cluster Observed Values
-{{ $clusterEntry := get $raw "cluster" | default (dict) }}
-{{ $clusterResource := $clusterEntry.resource | default (dict) }}
-{{ $clusterStatus := $clusterResource.status | default (dict) }}
-{{ $clusterAtProvider := $clusterStatus.atProvider | default (dict) }}
-
-{{ $vpcConfigRaw := $clusterAtProvider.vpcConfig | default (list) }}
-{{ $clusterVpcConfig := dict }}
-{{ if and $vpcConfigRaw (eq (kindOf $vpcConfigRaw) "slice") (gt (len $vpcConfigRaw) 0) }}
-  {{ $clusterVpcConfig = index $vpcConfigRaw 0 }}
-{{ end }}
-
-{{ $identityRaw := $clusterAtProvider.identity | default (list) }}
-{{ $clusterIdentity := dict }}
-{{ if and $identityRaw (eq (kindOf $identityRaw) "slice") (gt (len $identityRaw) 0) }}
-  {{ $clusterIdentity = index $identityRaw 0 }}
-{{ end }}
-
-{{ $oidcRaw := $clusterIdentity.oidc | default (list) }}
-{{ $clusterOidc := dict }}
-{{ if and $oidcRaw (eq (kindOf $oidcRaw) "slice") (gt (len $oidcRaw) 0) }}
-  {{ $clusterOidc = index $oidcRaw 0 }}
-{{ end }}
-
-{{ $clusterConditions := $clusterStatus.conditions | default (list) }}
-{{ $controlPlaneStatus := "Pending" }}
-{{ range $clusterConditions }}
-  {{ if eq (get . "type") "Ready" }}
-    {{ $controlPlaneStatus = get . "reason" | default "Unknown" }}
-  {{ end }}
-{{ end }}
-
-# Control Plane IAM Role
-{{ $cpRoleEntry := get $raw "iam-role-controlplane" | default (dict) }}
-{{ $cpRoleAtProvider := ((($cpRoleEntry.resource | default (dict)).status | default (dict)).atProvider | default (dict)) }}
-
-# Node IAM Role
-{{ $nodeRoleEntry := get $raw "iam-role-node" | default (dict) }}
-{{ $nodeRoleAtProvider := ((($nodeRoleEntry.resource | default (dict)).status | default (dict)).atProvider | default (dict)) }}
-
-# KMS Key
-{{ $kmsEntry := get $raw "kms-key" | default (dict) }}
-{{ $kmsAtProvider := ((($kmsEntry.resource | default (dict)).status | default (dict)).atProvider | default (dict)) }}
-
-# Resource Tagging Policy
-{{ $tagPolicyEntry := get $raw "iam-policy-resource-tagging" | default (dict) }}
-{{ $tagPolicyAtProvider := ((($tagPolicyEntry.resource | default (dict)).status | default (dict)).atProvider | default (dict)) }}
-
-# Build observed slice
-{{ $observed := dict
-  "cluster" (dict
-    "endpoint" ($clusterAtProvider.endpoint | default "")
-    "securityGroupId" ($clusterVpcConfig.clusterSecurityGroupId | default "")
-    "oidcIssuer" ($clusterOidc.issuer | default "")
-    "oidc" (($clusterOidc.issuer | default "") | replace "https://" "")
-    "status" $controlPlaneStatus
-    "ready" (get $readiness "cluster" | default false)
-  )
-  "controlPlaneRole" (dict
-    "arn" ($cpRoleAtProvider.arn | default "")
-    "ready" (get $readiness "iam-role-controlplane" | default false)
-  )
-  "nodeRole" (dict
-    "arn" ($nodeRoleAtProvider.arn | default "")
-    "name" ($nodeRoleAtProvider.id | default "")
-    "ready" (get $readiness "iam-role-node" | default false)
-  )
-  "kms" (dict
-    "arn" ($kmsAtProvider.arn | default "")
-    "keyId" ($kmsAtProvider.keyId | default "")
-    "ready" (get $readiness "kms-key" | default false)
-  )
-  "taggingPolicy" (dict
-    "arn" ($tagPolicyAtProvider.arn | default "")
-    "ready" (get $readiness "iam-policy-resource-tagging" | default false)
-  )
-  "clusterAuth" (dict
-    "ready" (get $readiness "cluster-auth" | default false)
-  )
-  "readiness" $readiness
-}}
-
-# ==============================================================================
 # Initialize $state with unified structure
+# Observed state is populated by 001-state-observed-*.yaml.gotmpl files
 # ==============================================================================
 {{ $state := dict
   "spec" (dict
     "raw" $spec
     "effective" $effective
   )
-  "observed" $observed
+  "observed" (dict)
   "automode" (dict)
   "status" (dict)
 }}

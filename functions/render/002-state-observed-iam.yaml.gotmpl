@@ -1,0 +1,63 @@
+# code: language=yaml
+#
+# Set $state.observed IAM roles from atProvider values
+# Depends on: 001-state-observed-cluster.yaml.gotmpl ($state.observed._readiness, $state.observed._raw)
+#
+
+{{- $raw := $state.observed._raw }}
+{{- $readiness := $state.observed._readiness }}
+
+# ==============================================================================
+# Control Plane IAM Role
+# ==============================================================================
+{{- $cpRoleEntry := get $raw "iam-role-controlplane" | default dict }}
+{{- $cpRoleResource := $cpRoleEntry.resource | default dict }}
+{{- $cpRoleStatus := $cpRoleResource.status | default dict }}
+{{- $cpRoleAtProvider := $cpRoleStatus.atProvider | default dict }}
+
+{{- $cpRoleReady := get $readiness "iam-role-controlplane" | default false }}
+{{- $cpRoleArn := $cpRoleAtProvider.arn | default "" }}
+{{- $cpRoleName := $cpRoleAtProvider.id | default "" }}
+
+# ==============================================================================
+# Node IAM Role
+# ==============================================================================
+{{- $nodeRoleEntry := get $raw "iam-role-node" | default dict }}
+{{- $nodeRoleResource := $nodeRoleEntry.resource | default dict }}
+{{- $nodeRoleStatus := $nodeRoleResource.status | default dict }}
+{{- $nodeRoleAtProvider := $nodeRoleStatus.atProvider | default dict }}
+
+{{- $nodeRoleReady := get $readiness "iam-role-node" | default false }}
+{{- $nodeRoleArn := $nodeRoleAtProvider.arn | default "" }}
+{{- $nodeRoleName := $nodeRoleAtProvider.id | default "" }}
+
+# ==============================================================================
+# Resource Tagging Policy
+# ==============================================================================
+{{- $tagPolicyEntry := get $raw "iam-policy-resource-tagging" | default dict }}
+{{- $tagPolicyResource := $tagPolicyEntry.resource | default dict }}
+{{- $tagPolicyStatus := $tagPolicyResource.status | default dict }}
+{{- $tagPolicyAtProvider := $tagPolicyStatus.atProvider | default dict }}
+
+{{- $tagPolicyReady := get $readiness "iam-policy-resource-tagging" | default false }}
+{{- $tagPolicyArn := $tagPolicyAtProvider.arn | default "" }}
+
+# ==============================================================================
+# Set $state.observed IAM values
+# ==============================================================================
+{{- $state = set $state "observed" (merge $state.observed (dict
+  "controlPlaneRole" (dict
+    "ready" $cpRoleReady
+    "arn" $cpRoleArn
+    "name" $cpRoleName
+  )
+  "nodeRole" (dict
+    "ready" $nodeRoleReady
+    "arn" $nodeRoleArn
+    "name" $nodeRoleName
+  )
+  "taggingPolicy" (dict
+    "ready" $tagPolicyReady
+    "arn" $tagPolicyArn
+  )
+)) }}

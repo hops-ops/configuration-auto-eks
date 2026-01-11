@@ -1,0 +1,87 @@
+# code: language=yaml
+#
+# Set $state.observed.cluster from atProvider values
+# Also builds readiness map for use by other observed files
+# Depends on: 000-state-init.yaml.gotmpl ($state)
+#
+
+{{- $raw := $.observed.resources | default dict }}
+
+# ==============================================================================
+# Resource Readiness Helper
+# Build readiness map once for use by all observed templates
+# ==============================================================================
+{{- $readiness := dict }}
+{{- range $name, $entry := $raw }}
+  {{- $ready := false }}
+  {{- $resource := $entry.resource | default dict }}
+  {{- $status := $resource.status | default dict }}
+  {{- $conditions := $status.conditions | default list }}
+  {{- range $conditions }}
+    {{- if and (eq (get . "type") "Ready") (eq (get . "status") "True") }}
+      {{- $ready = true }}
+    {{- end }}
+  {{- end }}
+  {{- $readiness = merge $readiness (dict $name $ready) }}
+{{- end }}
+
+# ==============================================================================
+# Cluster Observed Values
+# ==============================================================================
+{{- $clusterEntry := get $raw "cluster" | default dict }}
+{{- $clusterResource := $clusterEntry.resource | default dict }}
+{{- $clusterStatus := $clusterResource.status | default dict }}
+{{- $clusterAtProvider := $clusterStatus.atProvider | default dict }}
+
+# VPC Config (returns as array, take first element)
+{{- $vpcConfigRaw := $clusterAtProvider.vpcConfig | default list }}
+{{- $clusterVpcConfig := dict }}
+{{- if and $vpcConfigRaw (eq (kindOf $vpcConfigRaw) "slice") (gt (len $vpcConfigRaw) 0) }}
+  {{- $clusterVpcConfig = index $vpcConfigRaw 0 }}
+{{- end }}
+
+# Identity/OIDC (returns as nested arrays)
+{{- $identityRaw := $clusterAtProvider.identity | default list }}
+{{- $clusterIdentity := dict }}
+{{- if and $identityRaw (eq (kindOf $identityRaw) "slice") (gt (len $identityRaw) 0) }}
+  {{- $clusterIdentity = index $identityRaw 0 }}
+{{- end }}
+{{- $oidcRaw := $clusterIdentity.oidc | default list }}
+{{- $clusterOidc := dict }}
+{{- if and $oidcRaw (eq (kindOf $oidcRaw) "slice") (gt (len $oidcRaw) 0) }}
+  {{- $clusterOidc = index $oidcRaw 0 }}
+{{- end }}
+
+# Control plane status from conditions
+{{- $clusterConditions := $clusterStatus.conditions | default list }}
+{{- $controlPlaneStatus := "Pending" }}
+{{- range $clusterConditions }}
+  {{- if eq (get . "type") "Ready" }}
+    {{- $controlPlaneStatus = get . "reason" | default "Unknown" }}
+  {{- end }}
+{{- end }}
+
+# Extract values
+{{- $clusterReady := get $readiness "cluster" | default false }}
+{{- $clusterEndpoint := $clusterAtProvider.endpoint | default "" }}
+{{- $clusterSecurityGroupId := $clusterVpcConfig.clusterSecurityGroupId | default "" }}
+{{- $clusterSubnetIds := $clusterVpcConfig.subnetIds | default list }}
+{{- $clusterOidcIssuer := $clusterOidc.issuer | default "" }}
+{{- $clusterOidcId := $clusterOidcIssuer | replace "https://" "" }}
+
+# ==============================================================================
+# Set $state.observed.cluster
+# ==============================================================================
+{{- $state = set $state "observed" (merge $state.observed (dict
+  "cluster" (dict
+    "ready" $clusterReady
+    "endpoint" $clusterEndpoint
+    "securityGroupId" $clusterSecurityGroupId
+    "subnetIds" $clusterSubnetIds
+    "oidcIssuer" $clusterOidcIssuer
+    "oidc" $clusterOidcId
+    "status" $controlPlaneStatus
+  )
+  "_readiness" $readiness
+  "_raw" $raw
+)) }}

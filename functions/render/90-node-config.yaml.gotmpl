@@ -33,7 +33,7 @@ spec:
         securityGroupSelectorTerms:
         - id: {{ $obs.cluster.securityGroupId }}
         subnetSelectorTerms:
-        {{- range $subnet := $am.cluster.subnetIds }}
+        {{- range $subnet := $am.cluster.observedSubnetIds }}
         - id: {{ $subnet }}
         {{- end }}
         tags: {{ $am.tags | toJson }}

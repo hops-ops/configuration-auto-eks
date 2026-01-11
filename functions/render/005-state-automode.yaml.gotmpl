@@ -28,7 +28,8 @@
 {{ $renderAccessEntries := $obs.cluster.ready }}
 {{ $renderOidc := and $eff.oidc.enabled $obs.cluster.ready }}
 {{ $renderSecurityGroupRules := and $eff.securityGroupRules.enabled (ne $obs.cluster.securityGroupId "") }}
-{{ $renderNodeConfig := and $eff.nodeConfig.enabled $obs.clusterAuth.ready }}
+# NodeConfig requires: enabled, clusterAuth ready, security group available, and observed subnets available
+{{ $renderNodeConfig := and $eff.nodeConfig.enabled $obs.clusterAuth.ready (ne $obs.cluster.securityGroupId "") $obs.cluster.subnetIds }}
 
 # ==============================================================================
 # Build $state.automode
@@ -42,6 +43,7 @@
     "accountId" $eff.accountId
     "version" $eff.version
     "subnetIds" $eff.subnetIds
+    "observedSubnetIds" $obs.cluster.subnetIds
     "subnetSelector" $eff.subnetSelector
     "useSubnetSelector" (and (not $eff.subnetIds) $eff.subnetSelector)
     "privateAccess" $eff.privateAccess
