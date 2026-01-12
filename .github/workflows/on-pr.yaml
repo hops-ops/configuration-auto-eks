@@ -54,8 +54,8 @@ jobs:
       aws-use-oidc: true
       aws-account-id: "034489662075"
       aws-region: us-east-2
-      timeout-minutes: 30
-      cleanup-timeout-minutes: 30
+      timeout-minutes: 45
+      cleanup-timeout-minutes: 60
       debug-resource-types: |
         [
           "network.aws.hops.ops.com.ai"
