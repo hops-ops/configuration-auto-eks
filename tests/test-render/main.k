@@ -100,7 +100,8 @@ _items = [
                     kind = "Role"
                     metadata.name = "test-tags-controlplane"
                     spec.forProvider.tags = {
-                        hops = "true"
+                        "hops.ops.com.ai/managed" = "true"
+                        "hops.ops.com.ai/autoekscluster" = "test-tags"
                         environment = "test"
                         team = "platform"
                     }
