@@ -35,6 +35,10 @@ _namespace = "default"
 _region = "us-east-2"  # Match CI workflow region
 _account_id = "034489662075"  # CI test account
 
+# IPAM Pool - from aws-ipam e2e test
+# Get pool IDs: aws ec2 describe-ipam-pools --query 'IpamPools[*].[IpamPoolId,AddressFamily,Description]' --output table
+_ipv4_private_pool_id = "ipam-pool-0607416fa3707147a"
+
 _items = [
     metav1alpha1.E2ETest {
         metadata.name = "autoekscluster"
@@ -119,9 +123,13 @@ _items = [
                             "e2etest" = "true"
                             "test-run" = _now
                         }
-                        # Use simple VPC CIDR (no IPAM for this test)
-                        vpc = {
-                            cidr = "10.200.0.0/16"
+                        # Use IPAM to auto-allocate VPC CIDR
+                        ipam = {
+                            ipv4 = {
+                                enabled = True
+                                poolId = _ipv4_private_pool_id
+                                netmaskLength = 16
+                            }
                         }
                         # Subnet layout - subnets calculated from VPC CIDR
                         subnetLayout = {
