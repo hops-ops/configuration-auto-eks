@@ -37,7 +37,7 @@ spec:
     {{- end }}
     ipProtocol: {{ $rule.ipProtocol }}
     securityGroupId: {{ $obs.cluster.securityGroupId }}
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" $ruleName) $am.tags | toJson }}
   providerConfigRef:
     name: {{ $am.providerConfig.name }}
     kind: {{ $am.providerConfig.kind }}

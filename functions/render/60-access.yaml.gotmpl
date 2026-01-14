@@ -102,22 +102,23 @@ spec:
 {{- end }}
 
 # ==============================================================================
-# Usages: Role/Cluster protect Access entries
+# Usages: Delete Access entries before Role/Cluster
 # ==============================================================================
 {{ $clusterReady := $obs.cluster.ready }}
 {{ $nodeRoleReady := $obs.nodeRole.ready }}
 
-# Node role protects AccessEntry
+# Delete AccessEntry before node role
 {{ if and $nodeRoleReady (get $readiness "access-entry-node") }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-node-role-by-access-entry-node
+  name: {{ $am.cluster.name }}-delete-access-entry-node-before-node-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-node-role-by-access-entry-node" }}
+    {{ setResourceNameAnnotation "delete-access-entry-node-before-node-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -130,17 +131,18 @@ spec:
       name: {{ $am.cluster.name }}-node-access
 {{ end }}
 
-# Cluster protects node access entry
+# Delete node access entry before Cluster
 {{ if and $clusterReady (get $readiness "access-entry-node") }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cluster-by-access-entry-node
+  name: {{ $am.cluster.name }}-delete-access-entry-node-before-cluster
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cluster-by-access-entry-node" }}
+    {{ setResourceNameAnnotation "delete-access-entry-node-before-cluster" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: Cluster
@@ -153,17 +155,18 @@ spec:
       name: {{ $am.cluster.name }}-node-access
 {{ end }}
 
-# Cluster protects node access policy
+# Delete node access policy before Cluster
 {{ if and $clusterReady (get $readiness "access-policy-node") }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cluster-by-access-policy-node
+  name: {{ $am.cluster.name }}-delete-access-policy-node-before-cluster
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cluster-by-access-policy-node" }}
+    {{ setResourceNameAnnotation "delete-access-policy-node-before-cluster" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: Cluster
@@ -176,7 +179,7 @@ spec:
       name: {{ $am.cluster.name }}-node-policy
 {{ end }}
 
-# Custom access entries - Cluster protects each entry and its policies
+# Custom access entries - Delete each entry and its policies before Cluster
 {{- range $i, $entry := $am.accessEntries }}
 {{- $entryName := printf "%s-custom-%d" $am.cluster.name $i }}
 {{- $entryResourceName := printf "access-entry-custom-%d" $i }}
@@ -186,11 +189,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cluster-by-{{ $entryResourceName }}
+  name: {{ $am.cluster.name }}-delete-{{ $entryResourceName }}-before-cluster
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation (printf "of-cluster-by-%s" $entryResourceName) }}
+    {{ setResourceNameAnnotation (printf "delete-%s-before-cluster" $entryResourceName) }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: Cluster
@@ -212,11 +216,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cluster-by-{{ $policyResourceName }}
+  name: {{ $am.cluster.name }}-delete-{{ $policyResourceName }}-before-cluster
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation (printf "of-cluster-by-%s" $policyResourceName) }}
+    {{ setResourceNameAnnotation (printf "delete-%s-before-cluster" $policyResourceName) }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: Cluster

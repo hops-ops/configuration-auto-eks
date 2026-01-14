@@ -22,7 +22,7 @@ spec:
   forProvider:
     clientIdList:
     - sts.amazonaws.com
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" $am.cluster.name) $am.tags | toJson }}
     thumbprintList:
     - 9e99a48a9960b14926bb7f3b02e22da2b0ab7280
     url: {{ $obs.cluster.oidcIssuer }}
@@ -31,18 +31,19 @@ spec:
     kind: {{ $am.providerConfig.kind }}
 
 # ==============================================================================
-# Usage: Cluster protects OIDC Provider
+# Usage: Delete OIDC Provider before Cluster
 # ==============================================================================
 {{ if and $obs.cluster.ready (get $readiness "oidc-provider") }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cluster-by-oidc
+  name: {{ $am.cluster.name }}-delete-oidc-before-cluster
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cluster-by-oidc" }}
+    {{ setResourceNameAnnotation "delete-oidc-before-cluster" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: Cluster

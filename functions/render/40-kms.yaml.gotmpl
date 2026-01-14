@@ -23,7 +23,7 @@ spec:
     deletionWindowInDays: 7
     description: Encryption key for EKS secrets in cluster {{ $am.cluster.name }}
     region: {{ $am.cluster.region }}
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" (printf "%s-secrets" $am.cluster.name)) $am.tags | toJson }}
   providerConfigRef:
     name: {{ $am.providerConfig.name }}
     kind: {{ $am.providerConfig.kind }}
@@ -47,18 +47,19 @@ spec:
     kind: {{ $am.providerConfig.kind }}
 
 # ==============================================================================
-# Usage: KMS Key protects Alias
+# Usage: Delete Alias before KMS Key
 # ==============================================================================
 {{ if and $obs.kms.ready (get $readiness "kms-alias") }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-kms-by-alias
+  name: {{ $am.cluster.name }}-delete-alias-before-kms
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-kms-by-alias" }}
+    {{ setResourceNameAnnotation "delete-alias-before-kms" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: kms.aws.m.upbound.io/v1beta1
     kind: Key

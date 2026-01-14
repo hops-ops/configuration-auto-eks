@@ -41,7 +41,7 @@ spec:
     region: {{ $am.cluster.region }}
     roleArnRef:
       name: {{ $am.cluster.name }}-controlplane
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" $am.cluster.name) $am.tags | toJson }}
     storageConfig:
       blockStorage:
         enabled: true
@@ -65,20 +65,21 @@ spec:
     kind: {{ $am.providerConfig.kind }}
 
 # ==============================================================================
-# Usages: Role/KMS protect Cluster
+# Usages: Delete Cluster before Role/KMS/Subnets
 # ==============================================================================
 
-# Control plane role protects EKS Cluster
+# Delete Cluster before control plane role
 {{ if and $obs.controlPlaneRole.ready $obs.cluster.ready }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-cluster
+  name: {{ $am.cluster.name }}-delete-cluster-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-cluster" }}
+    {{ setResourceNameAnnotation "delete-cluster-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -91,17 +92,18 @@ spec:
       name: {{ $am.cluster.name }}
 {{ end }}
 
-# KMS Key protects Cluster (when encryption enabled)
+# Delete Cluster before KMS Key (when encryption enabled)
 {{ if and $am.cluster.encryptionEnabled $obs.kms.ready $obs.cluster.ready }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-kms-by-cluster
+  name: {{ $am.cluster.name }}-delete-cluster-before-kms
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-kms-by-cluster" }}
+    {{ setResourceNameAnnotation "delete-cluster-before-kms" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: kms.aws.m.upbound.io/v1beta1
     kind: Key
@@ -114,18 +116,19 @@ spec:
       name: {{ $am.cluster.name }}
 {{ end }}
 
-# Subnets protect Cluster (when using subnetIdSelector with matchLabels)
+# Delete Cluster before Subnets (when using subnetIdSelector with matchLabels)
 {{- $hasMatchLabels := and $am.cluster.useSubnetSelector $am.cluster.subnetSelector.matchLabels }}
 {{ if and $hasMatchLabels $obs.cluster.ready }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-subnets-by-cluster
+  name: {{ $am.cluster.name }}-delete-cluster-before-subnets
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-subnets-by-cluster" }}
+    {{ setResourceNameAnnotation "delete-cluster-before-subnets" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: ec2.aws.m.upbound.io/v1beta1
     kind: Subnet

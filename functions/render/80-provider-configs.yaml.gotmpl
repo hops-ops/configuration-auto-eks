@@ -24,18 +24,19 @@ spec:
     kind: {{ $am.providerConfig.kind }}
 
 # ==============================================================================
-# Usage: Cluster protects ClusterAuth
+# Usage: Delete ClusterAuth before Cluster
 # ==============================================================================
 {{ if and $obs.cluster.ready $obs.clusterAuth.ready }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cluster-by-cluster-auth
+  name: {{ $am.cluster.name }}-delete-cluster-auth-before-cluster
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cluster-by-cluster-auth" }}
+    {{ setResourceNameAnnotation "delete-cluster-auth-before-cluster" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: eks.aws.m.upbound.io/v1beta1
     kind: Cluster

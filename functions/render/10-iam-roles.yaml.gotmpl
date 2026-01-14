@@ -31,7 +31,7 @@ spec:
           }
         ]
       }
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" (printf "%s-controlplane" $am.cluster.name)) $am.tags | toJson }}
     {{- if $am.iam.permissionsBoundary }}
     permissionsBoundary: {{ $am.iam.permissionsBoundary }}
     {{- end }}
@@ -66,7 +66,7 @@ spec:
           }
         ]
       }
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" (printf "%s-node" $am.cluster.name)) $am.tags | toJson }}
     {{- if $am.iam.permissionsBoundary }}
     permissionsBoundary: {{ $am.iam.permissionsBoundary }}
     {{- end }}

@@ -156,7 +156,7 @@ spec:
     kind: {{ $am.providerConfig.kind }}
 
 # ==============================================================================
-# Usages: IAM Roles protect RolePolicyAttachments
+# Usages: Delete RolePolicyAttachments before IAM Roles
 # ==============================================================================
 {{ $cpRoleReady := $obs.controlPlaneRole.ready }}
 
@@ -165,11 +165,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-attach-block-storage
+  name: {{ $am.cluster.name }}-delete-attach-block-storage-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-attach-block-storage" }}
+    {{ setResourceNameAnnotation "delete-attach-block-storage-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -187,11 +188,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-attach-cluster
+  name: {{ $am.cluster.name }}-delete-attach-cluster-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-attach-cluster" }}
+    {{ setResourceNameAnnotation "delete-attach-cluster-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -209,11 +211,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-attach-compute
+  name: {{ $am.cluster.name }}-delete-attach-compute-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-attach-compute" }}
+    {{ setResourceNameAnnotation "delete-attach-compute-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -231,11 +234,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-attach-lb
+  name: {{ $am.cluster.name }}-delete-attach-lb-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-attach-lb" }}
+    {{ setResourceNameAnnotation "delete-attach-lb-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -253,11 +257,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-attach-network
+  name: {{ $am.cluster.name }}-delete-attach-network-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-attach-network" }}
+    {{ setResourceNameAnnotation "delete-attach-network-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -275,11 +280,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-cp-role-by-attach-tagging
+  name: {{ $am.cluster.name }}-delete-attach-tagging-before-cp-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-cp-role-by-attach-tagging" }}
+    {{ setResourceNameAnnotation "delete-attach-tagging-before-cp-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -292,17 +298,18 @@ spec:
       name: {{ $am.cluster.name }}-cp-resource-tagging
 {{ end }}
 
-# IAM Policy (resource-tagging) protects its RolePolicyAttachment
+# Delete RolePolicyAttachment before IAM Policy
 {{ if and $obs.taggingPolicy.ready (get $readiness "iam-attach-cp-resource-tagging") }}
 ---
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-policy-by-attach-tagging
+  name: {{ $am.cluster.name }}-delete-attach-tagging-before-policy
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-policy-by-attach-tagging" }}
+    {{ setResourceNameAnnotation "delete-attach-tagging-before-policy" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Policy
@@ -315,7 +322,7 @@ spec:
       name: {{ $am.cluster.name }}-cp-resource-tagging
 {{ end }}
 
-# Node role protects node policy attachments
+# Delete node attachments before node role
 {{ $nodeRoleReady := $obs.nodeRole.ready }}
 
 {{ if and $nodeRoleReady (get $readiness "iam-attach-node-ecr") }}
@@ -323,11 +330,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-node-role-by-attach-ecr
+  name: {{ $am.cluster.name }}-delete-attach-ecr-before-node-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-node-role-by-attach-ecr" }}
+    {{ setResourceNameAnnotation "delete-attach-ecr-before-node-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role
@@ -345,11 +353,12 @@ spec:
 apiVersion: protection.crossplane.io/v1beta1
 kind: Usage
 metadata:
-  name: {{ $am.cluster.name }}-of-node-role-by-attach-worker
+  name: {{ $am.cluster.name }}-delete-attach-worker-before-node-role
   labels: {{ $am.labels | toJson }}
   annotations:
-    {{ setResourceNameAnnotation "of-node-role-by-attach-worker" }}
+    {{ setResourceNameAnnotation "delete-attach-worker-before-node-role" }}
 spec:
+  replayDeletion: true
   of:
     apiVersion: iam.aws.m.upbound.io/v1beta1
     kind: Role

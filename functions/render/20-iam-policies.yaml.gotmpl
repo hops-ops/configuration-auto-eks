@@ -110,7 +110,7 @@ spec:
           }
         ]
       }
-    tags: {{ $am.tags | toJson }}
+    tags: {{ merge (dict "Name" (printf "%s-resource-tagging" $am.cluster.name)) $am.tags | toJson }}
   providerConfigRef:
     name: {{ $am.providerConfig.name }}
     kind: {{ $am.providerConfig.kind }}
