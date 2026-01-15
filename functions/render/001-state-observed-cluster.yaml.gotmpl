@@ -33,30 +33,12 @@
 {{- $clusterStatus := $clusterResource.status | default dict }}
 {{- $clusterAtProvider := $clusterStatus.atProvider | default dict }}
 
-# VPC Config (m.crossplane.io returns as object, upbound.io returns as array)
-{{- $vpcConfigRaw := $clusterAtProvider.vpcConfig | default dict }}
-{{- $clusterVpcConfig := dict }}
-{{- if eq (kindOf $vpcConfigRaw) "map" }}
-  {{- $clusterVpcConfig = $vpcConfigRaw }}
-{{- else if and (eq (kindOf $vpcConfigRaw) "slice") (gt (len $vpcConfigRaw) 0) }}
-  {{- $clusterVpcConfig = index $vpcConfigRaw 0 }}
-{{- end }}
+# VPC Config
+{{- $clusterVpcConfig := $clusterAtProvider.vpcConfig | default dict }}
 
-# Identity/OIDC (m.crossplane.io returns as object, upbound.io returns as nested arrays)
-{{- $identityRaw := $clusterAtProvider.identity | default dict }}
-{{- $clusterIdentity := dict }}
-{{- if eq (kindOf $identityRaw) "map" }}
-  {{- $clusterIdentity = $identityRaw }}
-{{- else if and (eq (kindOf $identityRaw) "slice") (gt (len $identityRaw) 0) }}
-  {{- $clusterIdentity = index $identityRaw 0 }}
-{{- end }}
-{{- $oidcRaw := $clusterIdentity.oidc | default dict }}
-{{- $clusterOidc := dict }}
-{{- if eq (kindOf $oidcRaw) "map" }}
-  {{- $clusterOidc = $oidcRaw }}
-{{- else if and (eq (kindOf $oidcRaw) "slice") (gt (len $oidcRaw) 0) }}
-  {{- $clusterOidc = index $oidcRaw 0 }}
-{{- end }}
+# Identity/OIDC
+{{- $clusterIdentity := $clusterAtProvider.identity | default dict }}
+{{- $clusterOidc := $clusterIdentity.oidc | default dict }}
 
 # Control plane status from conditions
 {{- $clusterConditions := $clusterStatus.conditions | default list }}

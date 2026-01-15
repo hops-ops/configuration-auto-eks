@@ -17,16 +17,16 @@ status:
     endpoint: https://ABCDEF1234567890.gr7.us-west-2.eks.amazonaws.com
     id: my-cluster
     identity:
-      - oidc:
-          - issuer: https://oidc.eks.us-west-2.amazonaws.com/id/ABCDEF1234567890
+      oidc:
+        issuer: https://oidc.eks.us-west-2.amazonaws.com/id/ABCDEF1234567890
     platformVersion: eks.1
     status: ACTIVE
     version: "1.31"
     vpcConfig:
-      - clusterSecurityGroupId: sg-0123456789abcdef0
-        endpointPrivateAccess: true
-        endpointPublicAccess: false
-        vpcId: vpc-0123456789abcdef0
-        subnetIds:
-          - subnet-private-a
-          - subnet-private-b
+      clusterSecurityGroupId: sg-0123456789abcdef0
+      endpointPrivateAccess: true
+      endpointPublicAccess: false
+      vpcId: vpc-0123456789abcdef0
+      subnetIds:
+        - subnet-private-a
+        - subnet-private-b
