@@ -56,10 +56,6 @@ jobs:
       aws-region: us-east-2
       timeout-minutes: 45
       cleanup-timeout-minutes: 60
-      debug-resource-types: |
-        [
-          "network.aws.hops.ops.com.ai"
-        ]
 
   version-and-tag:
     name: Version and Tag
