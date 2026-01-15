@@ -134,6 +134,10 @@ _items = [
                             name = "default"
                             kind = "ProviderConfig"
                         }
+                        kubernetesProviderConfigRef = {
+                            name = "default"
+                            kind = "ProviderConfig"
+                        }
                         tags = {
                             "e2etest" = "true"
                             "test-run" = _now
