@@ -68,6 +68,7 @@ spec:
       kind: ProviderConfig
       metadata:
         name: {{ $am.cluster.name }}
+        namespace: {{ $am.namespace }}
       spec:
         credentials:
           secretRef:
@@ -96,6 +97,7 @@ spec:
       kind: ProviderConfig
       metadata:
         name: {{ $am.cluster.name }}
+        namespace: {{ $am.namespace }}
       spec:
         credentials:
           secretRef:
